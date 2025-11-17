@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import XPGainAnimation from '../components/XPGainAnimation';
+import AchievementToast from '../components/AchievementToast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getQuizQuestions } from '../services/api';
 
@@ -10,6 +12,9 @@ function QuizPage() {
   const [userAnswers, setUserAnswers] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+    const [showXPGain, setShowXPGain] = useState(false);
+    const [xpGained, setXpGained] = useState(0);
+    const [earnedBadges, setEarnedBadges] = useState([]);
 
   useEffect(() => {
     fetchQuestions();
@@ -45,10 +50,56 @@ function QuizPage() {
     }
   };
 
-  const handleSubmit = () => {
-    navigate('/results', { state: { userAnswers, questions } });
-  };
+  const handleSubmit = async () => {
+    try {
+      // Calculate score
+      const correctAnswers = Object.keys(userAnswers).filter(
+        (questionId) => {
+          const question = questions.find((q) => q.id === parseInt(questionId));
+          return question && userAnswers[questionId] === question.correct_answer;
+        }
+      ).length;
 
+      // Call the gamification endpoint
+      const response = await fetch('https://educational-gamification-platform.onrender.com/api/quizzes/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: 1,
+          quiz_id: parseInt(id),
+          score: correctAnswers,
+          total_questions: questions.length,
+          time_taken: 300,
+          category: 'general'
+        })
+      });
+
+      const data = await response.json();
+
+      // Show XP gain animation
+      if (data.xp_gained > 0) {
+        setXpGained(data.xp_gained);
+        setShowXPGain(true);
+        setTimeout(() => setShowXPGain(false), 2000);
+      }
+
+      // Show badge toasts
+      if (data.earned_badges && data.earned_badges.length > 0) {
+        setEarnedBadges(data.earned_badges);
+        setTimeout(() => setEarnedBadges([]), 5000);
+      }
+
+      // Navigate to results after animations
+      setTimeout(() => {
+        navigate('/results', { state: { userAnswers, questions, gamificationData: data } });
+      }, 2500);
+
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      // Fallback: navigate anyway
+      navigate('/results', { state: { userAnswers, questions } });
+    }
+  };
   if (loading) return <div className="flex justify-center items-center min-h-[400px]"><div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600"></div></div>;
   if (error) return <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center"><p className="text-red-600">{error}</p></div>;
   if (questions.length === 0) return <div className="text-center p-8">Geen vragen beschikbaar.</div>;
@@ -126,6 +177,16 @@ function QuizPage() {
           </button>
         )}
       </div>
+
+            {/* Gamification Components */}
+      {showXPGain && <XPGainAnimation xp={xpGained} />}
+      {earnedBadges.map((badge, index) => (
+        <AchievementToast
+          key={index}
+          badge={badge}
+          onClose={() => setEarnedBadges(earnedBadges.filter((_, i) => i !== index))}
+        />
+      ))}
     </div>
   );
 }
