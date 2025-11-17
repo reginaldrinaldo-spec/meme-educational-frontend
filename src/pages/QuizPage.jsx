@@ -132,4 +132,3 @@ function QuizPage() {
 
 export default QuizPage;
 
-export default QuizPage;
