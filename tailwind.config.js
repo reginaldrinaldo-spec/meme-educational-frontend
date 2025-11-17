@@ -51,6 +51,16 @@ module.exports = {
         'xl': '1rem',
         '2xl': '1.5rem',
       },
+            keyframes: {
+                      "bounce-up": {
+                                  "0%": { transform: "translateY(20px)", opacity: "0" },
+                                  "30%": { transform: "translateY(0)", opacity: "1" },
+                                  "100%": { transform: "translateY(-40px)", opacity: "0" },
+                                },
+                    },
+            animation: {
+                      "bounce-up": "bounce-up 1.2s ease-out forwards",
+                    },
     },
   },
   plugins: [],
