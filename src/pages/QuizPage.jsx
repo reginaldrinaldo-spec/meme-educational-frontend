@@ -75,7 +75,7 @@ function QuizPage() {
           <span className="inline-block px-4 py-1 bg-secondary-100 text-secondary-800 rounded-full text-sm font-semibold mb-4">
             {currentQuestion.difficulty_level}
           </span>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">{currentQuestion.question_text}</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{currentQuestion.question}</h2>
         </div>
 
         {/* Answer Options */}
