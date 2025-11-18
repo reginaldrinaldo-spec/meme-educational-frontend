@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import QuizPage from './pages/QuizPage';
 import ResultsPage from './pages/ResultsPage';
+import Dashboard from './pages/Dashboard';
 import './index.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/quiz/:id" element={<QuizPage />} />
             <Route path="/results" element={<ResultsPage />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </main>
 
